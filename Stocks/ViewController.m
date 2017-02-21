@@ -136,7 +136,7 @@
 - (void)yahooRealTimeData:(NSMutableDictionary *)financeDictionary {
     
     NSLog(@"%@", financeDictionary);
-    self.valueLabel.text = [financeDictionary objectForKey:@"price"];
+    self.valueLabel.text = [NSString stringWithFormat:@"%.2f", [[financeDictionary objectForKey:@"price"] floatValue]];
     float change = [[financeDictionary objectForKey:@"change"] floatValue];
     
     if (change >= 0) {
