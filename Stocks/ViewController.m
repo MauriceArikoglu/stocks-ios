@@ -22,6 +22,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    /*
+    It has come to our attention that this service is being
+     used in violation of the Yahoo Terms of Service.
+     As such, the service is being discontinued.
+     For all future markets and equities data research,
+     please refer to http://finance.yahoo.com.
+    */
+    
     [self setNeedsStatusBarAppearanceUpdate];
     
     self.yahoo = [[YahooFinance alloc] init];
@@ -46,11 +54,6 @@
 - (UIStatusBarStyle)preferredStatusBarStyle {
     
     return UIStatusBarStyleLightContent;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - IBAction
@@ -106,20 +109,24 @@
 
 - (void)yahooFinanceData:(NSMutableDictionary *)financeDictionary {
     
-    [self.graphView setPriceData:[financeDictionary objectForKey:@"prices"] dateData:[financeDictionary objectForKey:@"dates"]];
-
-    [UIView animateWithDuration:0.5 animations:^{
+    if (financeDictionary != nil) {
         
-        self.fetchingInfoLabel.alpha = 0.0;
-        self.graphView.alpha = 1.0;
+        [self.graphView setPriceData:[financeDictionary objectForKey:@"prices"] dateData:[financeDictionary objectForKey:@"dates"]];
         
-    }];
-    
-    self.intervalControl.enabled = YES;
+        [UIView animateWithDuration:0.5 animations:^{
+            
+            self.fetchingInfoLabel.alpha = 0.0;
+            self.graphView.alpha = 1.0;
+            
+        }];
+        
+        self.intervalControl.enabled = YES;
+        
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        
+        //finance dictionary contains two arrays: 'prices' and conforming 'dates'
 
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-
-    //finance dictionary contains two arrays: 'prices' and conforming 'dates'
+    }
     
 }
 

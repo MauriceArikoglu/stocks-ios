@@ -63,28 +63,19 @@ const double SURGERY_1Y = 4.0;
                 
 //                NSLog(@"%@", json);
                 
-                NSDictionary *queryResult = [[NSDictionary alloc] initWithDictionary:[[json objectForKey:@"query"] objectForKey:@"results"]];
+                NSDictionary *queryResult = [[NSDictionary alloc] initWithDictionary:[json objectForKey:@"query"]];
                 
-                NSMutableArray *items = [[NSMutableArray alloc] initWithArray:[queryResult objectForKey:@"item"]];
-                
-                NSLog(@"%@", items);
-                
-//                for (NSDictionary *dayObject in quotes) {
-//                    
-//                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-//                    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
-//                    
-//                    NSDate *date = [dateFormatter dateFromString:[dayObject objectForKey:@"Date"]];
-//                    
-//                    [dateFormatter setDateStyle:NSDateFormatterLongStyle];
-//                    [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
-//                    
-//                    [dateParameters insertObject:[dateFormatter stringFromDate:date] atIndex:0];
-//                    [priceParameters insertObject:[NSString stringWithFormat:@"%.2f", [[dayObject objectForKey:@"Close"] floatValue]] atIndex:0];
-//                    
-//                }
-                
-                if ([self.delegate respondsToSelector:@selector(yahooFinanceNews:)]) [self.delegate yahooFinanceNews:items];
+                if (([queryResult objectForKey:@"results"] != [NSNull null]) && ([queryResult objectForKey:@"results"] != nil)) {
+                    
+                    NSDictionary *result = [[NSDictionary alloc] initWithDictionary:[queryResult objectForKey:@"results"]];
+                    
+                    NSMutableArray *items = [[NSMutableArray alloc] initWithArray:[result objectForKey:@"item"]];
+                    
+                    NSLog(@"%@", items);
+                    
+                    if ([self.delegate respondsToSelector:@selector(yahooFinanceNews:)]) [self.delegate yahooFinanceNews:items];
+
+                }
                 
             });
             
@@ -130,10 +121,15 @@ const double SURGERY_1Y = 4.0;
                 
 //                NSLog(@"%@", json);
                 
-                NSDictionary *queryResult = [[NSDictionary alloc] initWithDictionary:[[json objectForKey:@"query"] objectForKey:@"results"]];
+                NSDictionary *queryResult = [[NSDictionary alloc] initWithDictionary:[json objectForKey:@"query"]];
                 
-                
-                if ([self.delegate respondsToSelector:@selector(yahooRealTimeData:)]) [self.delegate yahooRealTimeData:[queryResult objectForKey:@"row"]];
+                if (([queryResult objectForKey:@"results"] != [NSNull null]) && ([queryResult objectForKey:@"results"] != nil)) {
+                    
+                    NSDictionary *result = [[NSDictionary alloc] initWithDictionary:[queryResult objectForKey:@"results"]];
+                    
+                    if ([self.delegate respondsToSelector:@selector(yahooRealTimeData:)]) [self.delegate yahooRealTimeData:[result objectForKey:@"row"]];
+
+                }
                 
             });
             
@@ -233,58 +229,63 @@ const double SURGERY_1Y = 4.0;
     
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
     
-//    NSLog(@"%@", json);
+    NSDictionary *queryResult = [[NSDictionary alloc] initWithDictionary:[json objectForKey:@"query"]];
     
-    NSDictionary *queryResult = [[NSDictionary alloc] initWithDictionary:[[json objectForKey:@"query"] objectForKey:@"results"]];
-    
-    NSMutableArray *quotes = [[NSMutableArray alloc] initWithArray:[queryResult objectForKey:@"quote"]];
-    
-    NSMutableArray *priceParameters = [[NSMutableArray alloc] init];
-    NSMutableArray *dateParameters = [[NSMutableArray alloc] init];
-    
-    for (NSDictionary *dayObject in quotes) {
+    if (([queryResult objectForKey:@"results"] != [NSNull null]) && ([queryResult objectForKey:@"results"] != nil)) {
         
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        NSDictionary *result = [[NSDictionary alloc] initWithDictionary:[queryResult objectForKey:@"results"]];
         
-        NSDate *date = [dateFormatter dateFromString:[dayObject objectForKey:@"Date"]];
+        NSMutableArray *quotes = [[NSMutableArray alloc] initWithArray:[result objectForKey:@"quote"]];
         
-        [dateFormatter setDateStyle:NSDateFormatterLongStyle];
-        [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+        NSMutableArray *priceParameters = [[NSMutableArray alloc] init];
+        NSMutableArray *dateParameters = [[NSMutableArray alloc] init];
         
-        [dateParameters insertObject:[dateFormatter stringFromDate:date] atIndex:0];
-        [priceParameters insertObject:[NSString stringWithFormat:@"%.2f", [[dayObject objectForKey:@"Close"] floatValue]] atIndex:0];
-        
-    }
-    
-    switch (self.requestInterval) {
-        case YFLast6Months:
-        {
-            return [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                    [self performPlasticSurgeryOn:priceParameters withSteps:SURGERY_6M], @"prices",
-                    [self performPlasticSurgeryOn:dateParameters withSteps:SURGERY_6M], @"dates",
-                    nil];
-        }
-            break;
+        for (NSDictionary *dayObject in quotes) {
             
-        case YFLastYear:
-        {
-            return [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                    [self performPlasticSurgeryOn:priceParameters withSteps:SURGERY_1Y], @"prices",
-                    [self performPlasticSurgeryOn:dateParameters withSteps:SURGERY_1Y], @"dates",
-                    nil];
-        }
-            break;
+            NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+            [dateFormatter setDateFormat:@"yyyy-MM-dd"];
             
-        default:
-            break;
+            NSDate *date = [dateFormatter dateFromString:[dayObject objectForKey:@"Date"]];
+            
+            [dateFormatter setDateStyle:NSDateFormatterLongStyle];
+            [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+            
+            [dateParameters insertObject:[dateFormatter stringFromDate:date] atIndex:0];
+            [priceParameters insertObject:[NSString stringWithFormat:@"%.2f", [[dayObject objectForKey:@"Close"] floatValue]] atIndex:0];
+            
+        }
+        
+        switch (self.requestInterval) {
+            case YFLast6Months:
+            {
+                return [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                        [self performPlasticSurgeryOn:priceParameters withSteps:SURGERY_6M], @"prices",
+                        [self performPlasticSurgeryOn:dateParameters withSteps:SURGERY_6M], @"dates",
+                        nil];
+            }
+                break;
+                
+            case YFLastYear:
+            {
+                return [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                        [self performPlasticSurgeryOn:priceParameters withSteps:SURGERY_1Y], @"prices",
+                        [self performPlasticSurgeryOn:dateParameters withSteps:SURGERY_1Y], @"dates",
+                        nil];
+            }
+                break;
+                
+            default:
+                break;
+        }
+        
+        
+        return [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                priceParameters, @"prices",
+                dateParameters, @"dates",
+                nil];
     }
 
-
-    return [NSMutableDictionary dictionaryWithObjectsAndKeys:
-            priceParameters, @"prices",
-            dateParameters, @"dates",
-            nil];
+    return nil;
 }
 
 - (NSMutableArray *)performPlasticSurgeryOn:(NSArray *)patient withSteps:(int)steps {
