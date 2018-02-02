@@ -132,41 +132,49 @@
 
 - (void)yahooFinanceNews:(NSMutableArray *)financeNewsArray {
 
-    NSLog(@"%@", financeNewsArray);
+    if (financeNewsArray != nil) {
+        
+        NSLog(@"%@", financeNewsArray);
+        
+        self.yahooNews = [NSMutableArray arrayWithArray:financeNewsArray];
+        [self.newsTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+        //update tableview
 
-    self.yahooNews = [NSMutableArray arrayWithArray:financeNewsArray];
-    [self.newsTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-    //update tableview
+    }
     
 }
 
 - (void)yahooRealTimeData:(NSMutableDictionary *)financeDictionary {
     
-    NSLog(@"%@", financeDictionary);
-    self.valueLabel.text = [NSString stringWithFormat:@"%.2f", [[financeDictionary objectForKey:@"price"] floatValue]];
-    float change = [[financeDictionary objectForKey:@"change"] floatValue];
-    
-    if (change >= 0) {
+    if (financeDictionary != nil) {
         
-        //set color green
-        self.changeLabel.backgroundColor = [UIColor colorWithRed:0 green:255.0/128.0 blue:0 alpha:0.4];
-        self.changeLabel.text = [NSString stringWithFormat:@"+%.2f%%", change];
-
-    } else {
+        NSLog(@"%@", financeDictionary);
+        self.valueLabel.text = [NSString stringWithFormat:@"%.2f", [[financeDictionary objectForKey:@"price"] floatValue]];
+        float change = [[financeDictionary objectForKey:@"change"] floatValue];
         
-        //set color red
-        self.changeLabel.backgroundColor = [UIColor colorWithRed:255.0/128.0 green:0 blue:0 alpha:0.4];
-        self.changeLabel.text = [NSString stringWithFormat:@"-%.2f%%", change];
-
+        if (change >= 0) {
+            
+            //set color green
+            self.changeLabel.backgroundColor = [UIColor colorWithRed:0 green:255.0/128.0 blue:0 alpha:0.4];
+            self.changeLabel.text = [NSString stringWithFormat:@"+%.2f%%", change];
+            
+        } else {
+            
+            //set color red
+            self.changeLabel.backgroundColor = [UIColor colorWithRed:255.0/128.0 green:0 blue:0 alpha:0.4];
+            self.changeLabel.text = [NSString stringWithFormat:@"-%.2f%%", change];
+            
+        }
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            
+            self.valueLabel.alpha = 1.0;
+            self.changeLabel.alpha = 1.0;
+            self.symbolLabel.alpha = 1.0;
+            
+        }];
+        
     }
-    
-    [UIView animateWithDuration:0.3 animations:^{
-       
-        self.valueLabel.alpha = 1.0;
-        self.changeLabel.alpha = 1.0;
-        self.symbolLabel.alpha = 1.0;
-        
-    }];
     
 }
 
